@@ -1,0 +1,381 @@
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<!-- import jquery.js package -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+	<!-- import web3.js package -->
+	<!-- this is web3@0.x, please do not change to web3@1.x, otherwise the application will break -->
+	<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Decentralized Double Color Balls</h1>
+
+		<b>Your Wallet Address: </b><b id="Wallet Address"></b>
+		<br />
+		<button type="button" onclick="checkWalletAddress()">Check Wallet Address</button>
+		<br /><br />
+
+		<b>Deposit ETH:</b>
+		<input id="Deposit Amount" type="text" value="" min="0.000"
+			oninput="this.value=this.value.replace(/\D*(\d*)(\.?)(\d{0,3})\d*/,'$1$2$3')" pattern="[0-9]*\.?[0-9]{0,3}">
+		<br />
+		<button type="button" onclick="depositETH()">Deposit</button>
+		<br /><br />
+
+		<b>Current Contract Balance: </b><b id="Contract Balance"></b><b> ETH</b>
+		<br />
+		<button type="button" onclick="checkContractBalance()">Check Contract Balance</button>
+		<br /><br />
+
+		<b>Current Game State: </b><b id="Game State"></b>
+		<br />
+		<button type="button" onclick="checkGameState()">Check Game State</button>
+		<br /><br />
+
+		<b>Start Game:</b>
+		<input id="Bet Quantity" type="text" value="" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+		<br />
+		<button type="button" onclick="startGame()">Start</button>
+		<br /><br />
+
+		<b>Bet Number:</b>
+		<input id="Bet String" type="text" value="" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')">
+		<br />
+		<button type="button" onclick="bet()">Bet</button>
+		<br /><br />
+
+		<b>Fulfill:</b>
+		<button type="button" onclick="fulfill()">Fulfill</button>
+		<br /><br />
+
+		<b>Accumulated Prize Pool: </b><b id="Acc Pool"></b><b> ETH</b>
+		<br />
+		<b>Current Prize Pool: </b><b id="Cur Pool"></b><b> ETH</b>
+		<br />
+		<button type="button" onclick="checkPrizePool()">Check Prize Pool</button>
+		<br /><br />
+
+		<b>Bet Information: </b><b id="Bet Info"></b>
+		<br />
+		<button type="button" onclick="checkBetInfo()">Check Bet Information</button>
+		<br /><br />
+
+		<b>Prize Information (ETH): </b><b id="Prize Info"></b>
+		<br />
+		<button type="button" onclick="checkPrizeInfo()">Check Prize Information</button>
+		<br /><br />
+
+		<b>Players: </b><b id="Players"></b>
+		<br />
+		<button type="button" onclick="checkPlayers()">Check Players</button>
+		<br /><br />
+
+		<b>Chairman: </b><b id="Chairman"></b>
+		<br />
+		<button type="button" onclick="checkChairman()">Check Chairman</button>
+		<br /><br />
+
+		<b>Prize Lottery: </b><b id="Prize Lottery"></b>
+		<br />
+		<button type="button" onclick="checkPrizeLottery()">Check Prize Lottery</button>
+		<br /><br />
+
+		<b>Prize Quantity: </b><b id="Prize Quantity"></b>
+		<br />
+		<button type="button" onclick="checkPrizeQuantity()">Check Prize Quantity</button>
+		<br /><br />
+
+		<b>Prize Amount (ETH): </b><b id="Prize Amount"></b>
+		<br />
+		<button type="button" onclick="checkPrizeAmount()">Check Prize Amount</button>
+		<br /><br />
+
+		<b>Game ID: </b><b id="Game ID"></b>
+		<br />
+		<button type="button" onclick="checkGameID()">Check Game ID</button>
+		<br /><br />
+
+		<b>Maximum Bets: </b><b id="Maximum Bets"></b>
+		<br />
+		<button type="button" onclick="checkMaxBet()">Check Maximum Bets</button>
+		<br /><br />
+
+		<b>Current Bets: </b><b id="Current Bets"></b>
+		<br />
+		<button type="button" onclick="checkCurBet()">Check Current Bets</button>
+		<br /><br />
+	</div>
+	<script>
+		if (typeof web3 !== "undefined") {
+			web3 = new Web3(web3.currentProvider);
+		} else {
+			// Set the provider you want from Web3.providers
+			web3 = new Web3(
+				//   new Web3.providers.HttpProvider("https://ropsten.etherscan.io/")
+				new Web3.providers.HttpProvider("http://127.0.0.1:7545")
+			);
+		}
+
+		// set ABI
+		var abiData = $.ajax({ url: "abi.json", type: "GET", dataType: "json", async: false, success: function (data) { } });
+		var abi = $.parseJSON(abiData.responseText);
+
+		//set contract address
+		//   var contractAddress = "0x28c37E0cB4e9B694Da4D71dAf2dae0db11ED7354"; // Ropsten
+		var contractAddress = "0xCB0a02E5978c52e520Eb448531257d2f1f43D6c2"; //Remix
+
+		// create the contract information
+		//var contractInfo = web3.eth.contract(abi);
+		var contract = new web3.eth.Contract(abi, contractAddress);
+
+		// get the contract
+		//var contract = contractInfo.at(contractAddress);
+
+		// enable the pop-up window for metamask
+		window.ethereum.enable();
+
+		// get the DOM element to display the results
+		var info = document.getElementById("info");
+
+		function checkWalletAddress() {
+			try {
+				document.getElementById("Wallet Address").innerHTML = ethereum.selectedAddress;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function depositETH() {
+			try {
+				var amountToSend = web3.utils.toWei(document.getElementById("Deposit Amount").value, "ether"); // Convert to wei value
+				var res = await contract.methods.deposit().send({ "from": ethereum.selectedAddress, "value": amountToSend });
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkContractBalance() {
+			try {
+				var res = await contract.methods.querryBalance().call({"from": ethereum.selectedAddress});
+				var resInETH = new Number(web3.utils.fromWei(res, 'ether'));
+				document.getElementById("Contract Balance").innerHTML = resInETH.toFixed(6);
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkGameState() {
+			try {
+				var res = await contract.methods.querryLotteryState().call({"from": ethereum.selectedAddress});
+				document.getElementById("Game State").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function startGame() {
+			try {
+				var betQuantity = parseInt(document.getElementById("Bet Quantity").value);
+				var res = await contract.methods.startNewLottery(betQuantity).send({ "from": ethereum.selectedAddress });
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function bet() {
+			try {
+				var amountToSend = web3.utils.toWei("10", "finney"); // Convert to wei value
+				var res = await contract.methods.bet(document.getElementById("Bet String").value).send({ "from": ethereum.selectedAddress, "value": amountToSend });
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkBetInfo() {
+			try {
+				var res = await contract.methods.querryBetInformation().call({"from": ethereum.selectedAddress});
+				document.getElementById("Bet Info").innerHTML = res; alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPrizeInfo() {
+			try {
+				var res = await contract.methods.querryPrizeInformation().call({"from": ethereum.selectedAddress});
+				if (res == "") {
+					document.getElementById("Prize Info").innerHTML = "";
+				} else {
+					var resSplit = res.split('\n');
+					var resArray = resSplit[1].split(' ');
+					var resStr = resSplit[0] + '\n';
+					for (i = 0, len = resArray.length-1; i < len; i++) {
+						var curNum = new Number(web3.utils.fromWei(resArray[i], 'ether'));
+						resStr = resStr + curNum.toFixed(6).toString() + " ";
+					}
+					document.getElementById("Prize Info").innerHTML = resStr;
+				}
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPlayers() {
+			try {
+				var res = await contract.methods.querryPlayers().call({"from": ethereum.selectedAddress});
+				document.getElementById("Players").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkChairman() {
+			try {
+				var res = await contract.methods.querryChairman().call({"from": ethereum.selectedAddress});
+				document.getElementById("Chairman").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPrizePool() {
+			try {
+				var accRes = await contract.methods.querryAccPrizePool().call({"from": ethereum.selectedAddress});
+				var curRes = await contract.methods.querryCurPrizePool().call({"from": ethereum.selectedAddress});
+				var accResInETH = new Number(web3.utils.fromWei(accRes, 'ether'));
+				var curResInETH = new Number(web3.utils.fromWei(curRes, 'ether'));
+				document.getElementById("Acc Pool").innerHTML = accResInETH.toFixed(6);
+				document.getElementById("Cur Pool").innerHTML = curResInETH.toFixed(6);
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPrizeLottery() {
+			try {
+				var res = await contract.methods.querryPrizeLottery().call({"from": ethereum.selectedAddress});
+				document.getElementById("Prize Lottery").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPrizeQuantity() {
+			try {
+				var res = await contract.methods.querryPrizeQuantity().call({"from": ethereum.selectedAddress});
+				document.getElementById("Prize Quantity").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkPrizeAmount() {
+			try {
+				var res = await contract.methods.querryPrizeAmount().call({"from": ethereum.selectedAddress});
+				var resArray = res.split(' ');
+				var resStr = "";
+				for (i = 0, len = resArray.length; i < len; i++) {
+					var curNum = new Number(web3.utils.fromWei(resArray[i], 'ether'));
+					resStr = resStr + curNum.toFixed(6).toString() + " ";
+				}
+				document.getElementById("Prize Amount").innerHTML = resStr;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkGameID() {
+			try {
+				var res = await contract.methods.querryLotteryId().call({"from": ethereum.selectedAddress});
+				document.getElementById("Game ID").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkMaxBet() {
+			try {
+				var res = await contract.methods.querryMaximumBet().call({"from": ethereum.selectedAddress});
+				document.getElementById("Maximum Bets").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function checkCurBet() {
+			try {
+				var res = await contract.methods.querryCurrentBet().call({"from": ethereum.selectedAddress});
+				document.getElementById("Current Bets").innerHTML = res;
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+
+		async function fulfill() {
+			try {
+				var res = await contract.methods.fulfillLottery().send({ "from": ethereum.selectedAddress });
+				alert("Fulfill Success!");
+				alert("Operation Success!");
+			}
+			catch (err) {
+				alert("Operation Failed!");
+				console.log(err);
+			}
+		}
+	</script>
+</body>
+
+</html>

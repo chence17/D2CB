@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>D2CB</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .user_container {
+            width: 700px;
+            float: left;
+        }
+
+        .administrator_container {
+            min-height: 2000px;
+            float: right;
+            width: 700px;
+            border-left: 15px solid rgb(16, 12, 223);
+        }
+
+        .administrator_container .administrator_container_inner {
+            margin-left: 30px;
+            margin-right: 20px;
+            margin-top: 60px;
+        }
+
+        .wp {
+            text-align: center;
+        }
+
+        .wp_select {
+            text-align: left;
+        }
+
+        .selected_pool {
+            text-align: left;
+            height: 120px;
+            /* border-radius: 40%; */
+            /* border: 2px rgb(137, 219, 43) solid; */
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            line-height: 50px;
+            color: #333;
+
+        }
+
+        .selected_pool_end {
+            text-align: left;
+            /* height:120px; */
+            /* border-radius: 40%; */
+            /* border: 2px rgb(137, 219, 43) solid; */
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            line-height: 50px;
+            color: #333;
+            background: beige;
+        }
+
+        .selected_pool .delete {
+            display: block;
+            float: right;
+            height: 50px;
+            width: 50px;
+            margin: 25px 5px 0 5px;
+            font-size: 40px;
+            font-weight: bold;
+            border-radius: 30%;
+            background: hsl(64, 96%, 48%);
+            border: 2px #F00 solid;
+        }
+
+        .selected_pool #select_end {
+            font-size: 20px;
+            width: 70px;
+            background: #FF0000;
+            /* text-align: left; */
+        }
+
+        /* 设置双色球的基本样式 */
+        .wp .auto_select {
+            display: inline-block;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px #F00 solid;
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            text-align: center;
+            line-height: 50px;
+            color: #333;
+        }
+
+        .wp .manual_select {
+            display: inline-block;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px #F00 solid;
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            text-align: center;
+            line-height: 50px;
+            color: #333;
+        }
+
+        .wp_select .span_second_r {
+            display: inline-block;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px #F00 solid;
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            text-align: center;
+            line-height: 50px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .wp_select .span_second_b {
+            display: inline-block;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px #0ff solid;
+            margin: 25px 5px 0 5px;
+            font-size: 20px;
+            text-align: center;
+            line-height: 50px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* 第七个球的样式 */
+        .wp .auto_select:nth-of-type(7n) {
+            border: 2px #0ff solid;
+        }
+
+        .wp .manual_select_blue {
+            border: 2px #0ff solid;
+        }
+
+        /* 设置按钮的基本样式 */
+        #btn {
+            /* display: block; */
+            height: 50px;
+            width: 150px;
+            background: #FF0000;
+            color: #fff;
+            border-radius: 5px;
+            border: 1px #333 solid;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 50px auto 0;
+        }
+
+        #clear {
+            /* display: block; */
+            height: 50px;
+            width: 100px;
+            background: #5d28d6;
+            color: #fff;
+            border-radius: 5px;
+            border: 1px #333 solid;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 50px auto 0;
+        }
+
+        #second_way {
+            /* display: block; */
+            height: 50px;
+            width: 150px;
+            background: #04da4b;
+            color: #fff;
+            border-radius: 5px;
+            border: 1px #333 solid;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 50px auto 0;
+        }
+
+        #box {
+            text-align: center;
+        }
+
+        .selected_pool_red {
+            display: inline;
+        }
+
+        .selected_pool_blue {
+            display: inline;
+        }
+
+        .user_check_info {
+            /* position: absolute; */
+            bottom: 0;
+            width: 50%;
+            height: 5rem;
+            margin-top: 30px;
+        }
+
+        .user_check_info button {
+            display: block;
+            zoom: 1;
+            padding: 6px 20px;
+            margin: 0;
+            cursor: pointer;
+            border: 1px solid #bbb;
+            overflow: visible;
+            font: bold 20px arial, helvetica, sans-serif;
+            text-decoration: none;
+            white-space: nowrap;
+            color: #555;
+            background-color: #ca3535;
+            border-color: #c43c35;
+            background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 1)), to(rgba(255, 255, 255, 0)));
+        }
+
+        .check_show {
+            display: block;
+            float: right;
+            /* width: 250px; */
+            text-align: left;
+            /* background-color: #5d28d6; */
+        }
+
+        .administrator_container button {
+            display: block;
+            zoom: 1;
+            padding: 6px 20px;
+            margin: 0;
+            cursor: pointer;
+            border: 1px solid #bbb;
+            overflow: visible;
+            font: bold 20px arial, helvetica, sans-serif;
+            text-decoration: none;
+            white-space: nowrap;
+            color: #555;
+            background-color: #35ca41;
+            border-color: #35c43c;
+            background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 1)), to(rgba(255, 255, 255, 0)));
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="user_container">
+        <h1>Uer Panel</h1>
+        <div id='box'>
+            <input type="button" id="btn" value="Lottery Machine" />
+            <input type="button" id="second_way" value="Manual Setect" />
+            <input type="button" id="clear" value="clear" />
+
+        </div>
+
+
+        <div class="wp" id="wp"></div>
+
+
+        <div class="selected_pool_end wp" id="selected_pool_end">
+
+        </div>
+        <div class="selected_pool" id="select_pool">
+
+            <div class="selected_pool_red wp" id="selected_pool_red">
+
+            </div>
+            <div class="selected_pool_blue wp" id="selected_pool_blue">
+
+            </div>
+
+            <input type="button" class="delete" id="select_end" value="select" />
+            <input type="button" class="delete" id="delete_x" value="X" />
+        </div>
+        <div class="wp_select" id="wp_select"></div>
+
+        <div class='user_check_info'>
+
+
+            <button type="button" onclick="checkWalletAddress()">Check Wallet Address</button>
+            <!-- <br /> -->
+
+            <b>Your Wallet Address: </b>
+
+            <b id="Wallet Address" class="check_show">aaaaaaa</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkGameState()">Check Game State</button>
+            <b>Current Game State: </b>
+            <b id="Game State" class="check_show">bbbbbbbbb</b>
+            <br /><br />
+
+            <!-- <b>Bet Number:</b>
+                <input id="Bet String" type="text" value="" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')">
+                <br />
+                <button type="button" onclick="bet()">Bet</button>
+                <br /><br /> -->
+
+
+            <br />
+            <button type="button" onclick="checkPrizePool()">Check Prize Pool</button>
+
+            <b>Accumulated Prize Pool: </b><b id="Acc Pool" class="check_show">ccccccccc</b><b> (ETH)</b>
+            <br />
+            <b>Current Prize Pool: </b><b id="Cur Pool" class="check_show">ccccccccc</b><b> (ETH)</b>
+            <br /><br />
+
+
+
+
+            <br />
+            <button type="button" onclick="checkBetInfo()">Check Bet Information</button>
+            <b>Bet Information: </b><b id="Bet Info" class="check_show">ddddddd</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkPrizeInfo()">Check Prize Information</button>
+            <b>Prize Information (ETH): </b>
+            <b id="Prize Info" class="check_show">eeeeeeeeee</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkChairman()">Check Chairman</button>
+            <b>Chairman: </b>
+            <b id="Chairman" class="check_show">ffffffff</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkPrizeLottery()">Check Prize Lottery</button>
+            <b>Prize Lottery: </b>
+            <b id="Prize Lottery" class="check_show">gggggg</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkPrizeQuantity()">Check Prize Quantity</button>
+            <b>Prize Quantity: </b>
+            <b id="Prize Quantity" class="check_show">hhhhhhhhh</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkPrizeAmount()">Check Prize Amount</button>
+            <b>Prize Amount (ETH): </b>
+            <b id="Prize Amount" class="check_show">iiiiiiiiii</b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkGameID()">Check Game ID</button>
+            <b>Game ID: </b>
+            <b id="Game ID" class="check_show">jjjjjjjjjj</b>
+            <br /><br />
+
+        </div>
+
+
+    </div>
+
+    <div class='administrator_container'>
+        <h1>Administrator Panel</h1>
+        <div class="administrator_container_inner">
+
+
+            <b>Deposit ETH:</b>
+            <input id="Deposit Amount" type="text" value="" min="0.000"
+                oninput="this.value=this.value.replace(/\D*(\d*)(\.?)(\d{0,3})\d*/,'$1$2$3')"
+                pattern="[0-9]*\.?[0-9]{0,3}">
+            <br />
+            <button type="button" onclick="depositETH()">Deposit</button>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkContractBalance()">Check Contract Balance</button>
+            <b>Current Contract Balance: (ETH)</b>
+            <b id="Contract Balance" class="check_show">yyyyyyyyyyyyyy</b>
+            <br /><br />
+
+            <!-- <b>Current Game State: </b><b id="Game State"></b>
+            <br />
+            <button type="button" onclick="checkGameState()">Check Game State</button>
+            <br /><br /> -->
+
+            <b>Start Game:</b>
+            <input id="Bet Quantity" type="text" value="" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <br />
+            <button type="button" onclick="startGame()">Start</button>
+            <br /><br />
+
+            <!-- <b>Bet Number:</b>
+            <input id="Bet String" type="text" value="" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')">
+            <br />
+            <button type="button" onclick="bet()">Bet</button>
+            <br /><br /> -->
+
+            <b>Fulfill:</b>
+            <button type="button" onclick="fulfill()">Fulfill</button>
+            <br /><br />
+
+            <!-- <b>Accumulated Prize Pool: </b><b id="Acc Pool"></b><b> ETH</b>
+            <br />
+            <b>Current Prize Pool: </b><b id="Cur Pool"></b><b> ETH</b>
+            <br />
+            <button type="button" onclick="checkPrizePool()">Check Prize Pool</button>
+            <br /><br /> -->
+
+            <!-- <b>Bet Information: </b><b id="Bet Info"></b>
+            <br />
+            <button type="button" onclick="checkBetInfo()">Check Bet Information</button>
+            <br /><br /> -->
+
+            <!-- <b>Prize Information (ETH): </b><b id="Prize Info"></b>
+            <br />
+            <button type="button" onclick="checkPrizeInfo()">Check Prize Information</button>
+            <br /><br /> -->
+
+
+            <br />
+            <button type="button" onclick="checkPlayers()">Check Players</button>
+            <b>Players: </b>
+            <b id="Players" class="check_show"></b>
+            <br /><br />
+
+            <!-- <b>Chairman: </b><b id="Chairman"></b>
+            <br />
+            <button type="button" onclick="checkChairman()">Check Chairman</button>
+            <br /><br /> -->
+
+            <!-- <b>Prize Lottery: </b><b id="Prize Lottery"></b>
+            <br />
+            <button type="button" onclick="checkPrizeLottery()">Check Prize Lottery</button>
+            <br /><br /> -->
+
+            <!-- <b>Prize Quantity: </b><b id="Prize Quantity"></b>
+            <br />
+            <button type="button" onclick="checkPrizeQuantity()">Check Prize Quantity</button>
+            <br /><br /> -->
+
+            <!-- <b>Prize Amount (ETH): </b><b id="Prize Amount"></b>
+            <br />
+            <button type="button" onclick="checkPrizeAmount()">Check Prize Amount</button>
+            <br /><br /> -->
+
+            <!-- <b>Game ID: </b><b id="Game ID"></b>
+            <br />
+            <button type="button" onclick="checkGameID()">Check Game ID</button>
+            <br /><br /> -->
+
+
+            <br />
+            <button type="button" onclick="checkMaxBet()">Check Maximum Bets</button>
+            <b>Maximum Bets: </b><b id="Maximum Bets" class="check_show"></b>
+            <br /><br />
+
+
+            <br />
+            <button type="button" onclick="checkCurBet()">Check Current Bets</button>
+            <b>Current Bets: </b><b id="Current Bets" class="check_show"></b>
+            <br /><br />
+
+
+
+
+        </div>
+
+    </div>
+    <!-- <h1>Decentralized Double Color Balls</h1> -->
+
+    <!-- <b>Your Wallet Address: </b><b id="Wallet Address"></b>
+		<br />
+		<button type="button" onclick="checkWalletAddress()">Check Wallet Address</button>
+		<br /><br /> -->
+
+
+
+
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+
+<script type="text/javascript">
+
+    var btn = document.getElementById("btn");   //获取button按钮属性
+    var wp = document.getElementById("wp");      //获取wp属性
+
+    var second_way = document.getElementById("second_way");
+
+    var wp_select = document.getElementById("wp_select")
+
+    var delete_x = document.getElementById('delete_x')
+    var select_end = document.getElementById('select_end')
+
+    var select_pool_red = document.getElementById('selected_pool_red')
+    var select_pool_blue = document.getElementById('selected_pool_blue')
+
+    var selected_pool_end = document.getElementById('selected_pool_end')
+
+
+
+
+    var clear = document.getElementById("clear");
+
+    btn.onclick = function () {                 //btn 点击执行内容
+        var arr = [];                 //声明一个空数组
+        for (var i = 0; i < 6; i++) {             //for 循环
+            var a = Math.floor((Math.random() * 33) + 1);    //声明一个变量把1-33的随机数放进变量里面
+            if (arr.indexOf(a) == -1) {       //判断是否有重复的数字，如果有就放弃那个数字，重新随机获取一个随机数字，直到6个随机数没有重复值位置
+                arr.push(a);
+            } else {
+                i -= 1;
+
+            }
+        }
+        for (var n = 0; n < arr.length; n++) {            //把获取的6个随机数数组arr的值，分别写入wp内
+            wp.innerHTML += '<span class="auto_select">' + arr[n] + '</span>';
+        }
+        blue_num = Math.floor((Math.random() * 16) + 1)
+        wp.innerHTML += '<span class="auto_select">' + blue_num + '</span>';  //获取第七个蓝色球，1-16随机数
+        arr.push(blue_num);
+        wp.innerHTML += '<br />';
+
+        user_bet(arr);
+        console.log(arr);
+    };
+
+    clear.onclick = function (e) {
+        wp.innerHTML = "";
+        selected_pool_end.innerHTML = ""
+        manu_select_nums = []
+    }
+
+    second_way.onclick = function () {
+        wp_select.innerHTML = ""
+
+        for (var n = 1; n < 34; n++) {
+            wp_select.innerHTML += '<input type="button" class="span_second_r"' + "id=span_r_" + n + " value=" + n + ">" + '</input>';
+        }
+        wp_select.innerHTML += '<br />';
+        for (var i = 1; i < 17; i++) {
+            wp_select.innerHTML += '<input type="button" class="span_second_b"' + "id=span_b_" + i + " value=" + i + ">" + '</input>';
+        }
+
+    }
+
+    select_num_r = []
+    select_num_b = []
+    manu_select_nums = []
+
+    // if (wp_select.innerHTML != ""){
+    wp_select.onclick = function (e) {
+
+        selected_num = parseInt(e.target.value)
+
+        if ((e.target.id).split("_")[1] == "r") {
+            if (!select_num_r.includes(selected_num) && select_num_r.length < 6) {
+                select_num_r.push(selected_num)
+                select_pool_red.innerHTML += '<span class="manual_select manual_select_red">' + selected_num + '</span>';
+
+
+            }
+
+        }
+        else if ((e.target.id).split("_")[1] == "b") {
+            select_num_b[0] = selected_num
+            select_pool_blue.innerHTML = '<span class="manual_select manual_select_blue">' + selected_num + '</span>';
+
+
+        }
+
+        console.log(select_num_r, select_num_b)
+
+    }
+
+
+
+    delete_x.onclick = function () {
+        console.log(select_num_r)
+        select_num_r.pop()
+        console.log(select_num_r)
+        var e = document.querySelector("#selected_pool_red");
+        var last = e.lastElementChild;
+        last.remove();
+        last = e.lastElementChild;
+
+        console.log(last)
+
+    }
+    select_end.onclick = function () {
+        if (select_num_r.length != 6) {
+            alert('You should choose 6 numbers from red balls and 1 number from blue balls')
+            return
+        }
+
+
+        one_bet_nums = []
+        select_num_r.forEach(function (item) {
+            console.log(item);
+
+            selected_pool_end.innerHTML += '<span class="auto_select">' + item + '</span>';
+            one_bet_nums.push(item)
+        })
+        selected_pool_end.innerHTML += '<span class="auto_select">' + select_num_b[0] + '</span>';
+        one_bet_nums.push(select_num_b[0])
+        selected_pool_end.innerHTML += '<br />';
+        select_pool_blue.innerHTML = ""
+        select_pool_red.innerHTML = ""
+        manu_select_nums.push(one_bet_nums)
+
+        // bet(one_bet_nums)
+        user_bet(one_bet_nums)
+
+
+        // manu_select_nums.push(select_num_b)
+        select_num_r = []
+        select_num_b = []
+
+        console.log(manu_select_nums)
+
+    }
+
+
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+    } else {
+        // set the provider you want from Web3.providers
+        web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+    }
+
+    // set ABI
+    var abiData = $.ajax({ url: "abi.json", type: "GET", dataType: "json", async: false, success: function (data) { } });
+    var abi = $.parseJSON(abiData.responseText);
+    var contractAddress = "0x27f77265a4a29af811330B07a809816eC5B07dE0";
+    var contract = new web3.eth.Contract(abi, contractAddress);
+
+    window.ethereum.enable();
+
+
+    async function user_bet(bet_num) {
+        try {
+            bet_str = bet_num.join(' ')
+            var amountToSend = web3.utils.toWei("10", "finney"); // Convert to wei value
+            var res = await contract.methods.bet(bet_str).send({ "from": ethereum.selectedAddress, "value": amountToSend });
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            // console.log("Bet Failed!");
+            console.log(bet_num.join(' '))
+        }
+    }
+
+
+    //  Administrator Panel
+
+    function checkWalletAddress() {
+        try {
+            document.getElementById("Wallet Address").innerHTML = ethereum.selectedAddress;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function depositETH() {
+        try {
+            var amountToSend = web3.utils.toWei(document.getElementById("Deposit Amount").value, "ether"); // Convert to wei value
+            var res = await contract.methods.deposit().send({ "from": ethereum.selectedAddress, "value": amountToSend });
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkContractBalance() {
+        try {
+            var res = await contract.methods.querryBalance().call({ "from": ethereum.selectedAddress });
+            var resInETH = new Number(web3.utils.fromWei(res, 'ether'));
+            document.getElementById("Contract Balance").innerHTML = resInETH.toFixed(6) + ' ETH';
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkGameState() {
+        try {
+            var res = await contract.methods.querryLotteryState().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Game State").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+
+    }
+
+    async function startGame() {
+        try {
+            var betQuantity = parseInt(document.getElementById("Bet Quantity").value);
+            var res = await contract.methods.startNewLottery(betQuantity).send({ "from": ethereum.selectedAddress });
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkBetInfo() {
+        try {
+            var res = await contract.methods.querryBetInformation().call({ "from": ethereum.selectedAddress });
+            var resSplit = res.split('\n');
+            var resStr = "";
+            for (i = 0, len = resSplit.length - 1; i < len; i++) {
+                resStr = resStr + "[" + resSplit[i] + "] ";
+            }
+            document.getElementById("Bet Info").innerHTML = resStr;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPrizeInfo() {
+        try {
+            var res = await contract.methods.querryPrizeInformation().call({ "from": ethereum.selectedAddress });
+            if (res == "") {
+                document.getElementById("Prize Info").innerHTML = "";
+            } else {
+                var resSplit = res.split('\n');
+                var resArray = resSplit[1].split(' ');
+                var resStr = "[" + resSplit[0] + "] [";
+                for (i = 0, len = resArray.length - 1; i < len; i++) {
+                    var curNum = new Number(web3.utils.fromWei(resArray[i], 'ether'));
+                    resStr = resStr + curNum.toFixed(6).toString() + " ";
+                }
+                resStr = resStr + "] "
+                document.getElementById("Prize Info").innerHTML = resStr;
+            }
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPlayers() {
+        try {
+            var res = await contract.methods.querryPlayers().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Players").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkChairman() {
+        try {
+            var res = await contract.methods.querryChairman().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Chairman").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPrizePool() {
+        try {
+            var accRes = await contract.methods.querryAccPrizePool().call({ "from": ethereum.selectedAddress });
+            var curRes = await contract.methods.querryCurPrizePool().call({ "from": ethereum.selectedAddress });
+            var accResInETH = new Number(web3.utils.fromWei(accRes, 'ether'));
+            var curResInETH = new Number(web3.utils.fromWei(curRes, 'ether'));
+            document.getElementById("Acc Pool").innerHTML = accResInETH.toFixed(6);
+            document.getElementById("Cur Pool").innerHTML = curResInETH.toFixed(6);
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPrizeLottery() {
+        try {
+            var res = await contract.methods.querryPrizeLottery().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Prize Lottery").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPrizeQuantity() {
+        try {
+            var res = await contract.methods.querryPrizeQuantity().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Prize Quantity").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkPrizeAmount() {
+        try {
+            var res = await contract.methods.querryPrizeAmount().call({ "from": ethereum.selectedAddress });
+            var resArray = res.split(' ');
+            var resStr = "";
+            for (i = 0, len = resArray.length; i < len; i++) {
+                var curNum = new Number(web3.utils.fromWei(resArray[i], 'ether'));
+                resStr = resStr + curNum.toFixed(6).toString() + " ";
+            }
+            document.getElementById("Prize Amount").innerHTML = resStr;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkGameID() {
+        try {
+            var res = await contract.methods.querryLotteryId().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Game ID").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkMaxBet() {
+        try {
+            var res = await contract.methods.querryMaximumBet().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Maximum Bets").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function checkCurBet() {
+        try {
+            var res = await contract.methods.querryCurrentBet().call({ "from": ethereum.selectedAddress });
+            document.getElementById("Current Bets").innerHTML = res;
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+
+    async function fulfill() {
+        try {
+            var res = await contract.methods.fulfillLottery().send({ "from": ethereum.selectedAddress });
+            alert("Operation Success!");
+        }
+        catch (err) {
+            alert("Operation Failed!");
+            console.log(err);
+        }
+    }
+</script>
+
+</html>
